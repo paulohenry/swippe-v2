@@ -21,5 +21,6 @@ import { GetInfluencerService } from './services/get-influencer.service';
         GetInfluencerService,
         InfluencerRepository,
     ],
+    exports: [CreatInfluencerService],
 })
 export class InfluencerModule {}

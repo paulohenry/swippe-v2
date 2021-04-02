@@ -5,15 +5,15 @@ import {
     Get,
     Logger,
     Param,
-    Post,
+    Patch,
     Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Influencer } from '../schemas/influencer.schema';
 import { CreatInfluencerService } from '../services/create-influencer.service';
 import { DeleteInfluencerService } from '../services/delete-influencer.service';
 import { EditInfluencerService } from '../services/edit-influencer.service';
 import { GetInfluencerService } from '../services/get-influencer.service';
+
 @ApiTags('Influencers')
 @Controller('influencers')
 export class InfluencerController {
@@ -48,8 +48,13 @@ export class InfluencerController {
         return { message: `delete one influencer by Id ${id}` };
     }
 
-    @Post()
-    async create(@Body() dto: Influencer) {
-        return await this.createInfluencerService.createOneInfluencer(dto);
+    @Patch('avatar')
+    async uploadProfileImage(@Body() dto: any) {
+        return '';
+    }
+
+    @Patch('gallery')
+    async uploadGalleryImage(@Body() dto: any) {
+        return '';
     }
 }

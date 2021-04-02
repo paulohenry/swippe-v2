@@ -14,4 +14,8 @@ export class InfluencerRepository extends BaseAbstractRepository<InfluencerDocum
     ) {
         super(influencerModel);
     }
+
+    async createOneInfluencer(dto: any) {
+        return await this.create(dto);
+    }
 }

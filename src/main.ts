@@ -3,8 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as mongoose from 'mongoose';
 import * as mongoose_delete from 'mongoose-delete';
+import mongoosePaginate from 'mongoose-paginate-v2';
 import { AppModule } from './app.module';
-
 const setupSwagger = (app: INestApplication) => {
     const config = new DocumentBuilder()
         .setTitle('Users Api Endpoints')
@@ -12,7 +12,6 @@ const setupSwagger = (app: INestApplication) => {
         .setVersion('1.0')
         .addTag('Swippe Documentation')
         .build();
-
     const document = SwaggerModule.createDocument(app, config, {
         ignoreGlobalPrefix: false,
     });
@@ -25,6 +24,7 @@ async function bootstrap() {
         overrideMethods: 'all',
     });
 
+    mongoose.plugin(mongoosePaginate);
     const app = await NestFactory.create(AppModule);
 
     const globalPrefix = 'api/v2';

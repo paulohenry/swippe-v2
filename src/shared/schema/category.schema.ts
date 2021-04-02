@@ -1,19 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
-import { Subcategory } from './subcategory.schema';
-
+import { Document } from 'mongoose';
+import { ICategory } from '../interfaces/category.interface';
 export type CategoryDocument = Category & Document;
 
 @Schema({ timestamps: true, collection: 'categories' })
-export class Category {
+export class Category implements ICategory {
     @Prop()
     name: string;
 
     @Prop()
     image: number;
-
-    @Prop({ type: [{ type: Types.ObjectId, ref: 'Subcategory' }] })
-    subcategories: Subcategory[];
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
