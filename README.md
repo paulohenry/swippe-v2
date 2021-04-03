@@ -1,4 +1,5 @@
-## Docker Commands
+## COMMANDS 
 
-docker-compose up
-docker-compose exec main bash
+yarn - para baixar dependencias 
+yarn dev - para rodar localmente 
+nao esqueça de preencher as variaveis ambiente conforme .env.example
