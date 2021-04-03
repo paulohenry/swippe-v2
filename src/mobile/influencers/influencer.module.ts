@@ -1,26 +1,32 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { InfluencerForAdvertiserController } from './controllers/influencer-for-advertiser.controller';
 import { InfluencerController } from './controllers/influencer.controller';
+import { InfluencerSubjectsRepository } from './repositories/influencer-subjects.repository';
 import { InfluencerRepository } from './repositories/influencer.repository';
+import {
+    InfluencerSubjects,
+    InfluencerSubjectsSchema,
+} from './schemas/influencer-subjects.schema';
 import { Influencer, InfluencerSchema } from './schemas/influencer.schema';
-import { CreatInfluencerService } from './services/create-influencer.service';
-import { DeleteInfluencerService } from './services/delete-influencer.service';
-import { EditInfluencerService } from './services/edit-influencer.service';
-import { GetInfluencerService } from './services/get-influencer.service';
+import { InfluencerService } from './services/influencer.service';
 @Module({
     imports: [
         MongooseModule.forFeature([
             { name: Influencer.name, schema: InfluencerSchema },
+            { name: InfluencerSubjects.name, schema: InfluencerSubjectsSchema },
         ]),
     ],
-    controllers: [InfluencerController],
+    controllers: [InfluencerController, InfluencerForAdvertiserController],
     providers: [
-        CreatInfluencerService,
-        EditInfluencerService,
-        DeleteInfluencerService,
-        GetInfluencerService,
+        InfluencerService,
         InfluencerRepository,
+        InfluencerSubjectsRepository,
     ],
-    exports: [CreatInfluencerService],
+    exports: [
+        InfluencerService,
+        InfluencerRepository,
+        InfluencerSubjectsRepository,
+    ],
 })
 export class InfluencerModule {}

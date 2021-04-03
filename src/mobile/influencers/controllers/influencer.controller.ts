@@ -1,60 +1,45 @@
 import {
     Body,
     Controller,
-    Delete,
     Get,
     Logger,
-    Param,
     Patch,
-    Put,
+    UseGuards,
+    ValidationPipe,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { CreatInfluencerService } from '../services/create-influencer.service';
-import { DeleteInfluencerService } from '../services/delete-influencer.service';
-import { EditInfluencerService } from '../services/edit-influencer.service';
-import { GetInfluencerService } from '../services/get-influencer.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { UserLogged } from '../../../shared/decorators/user-logger.decorator';
+import { InfluencerRole } from '../../../shared/guards/influencer-role.guard';
+import { JwtAuthGuard } from '../../../shared/guards/jwt-auth.guard';
+import { IUserLogged } from '../../../shared/interfaces/user-logged.interface';
+import { InfluencerSubjectsDto } from '../dtos/upsert-subjects.dto';
+import { InfluencerService } from '../services/influencer.service';
 
-@ApiTags('Influencers')
-@Controller('influencers')
+@ApiTags('influencers')
+@Controller('influencers/me')
 export class InfluencerController {
     private logger: Logger;
 
-    constructor(
-        private readonly getInfluencerService: GetInfluencerService,
-        private readonly createInfluencerService: CreatInfluencerService,
-        private readonly deleteInfluencerService: DeleteInfluencerService,
-        private readonly editInfluencerService: EditInfluencerService,
-    ) {
+    constructor(private readonly influencerService: InfluencerService) {
         this.logger = new Logger(InfluencerController.name);
     }
 
-    @Get()
-    async index() {
-        return 'list all Influencers';
+    @Get('profile')
+    @UseGuards(JwtAuthGuard)
+    @UseGuards(InfluencerRole)
+    @ApiBearerAuth()
+    async getProfileMe(@UserLogged() user: IUserLogged) {
+        return await this.influencerService.getOneInfluencer(user.id);
     }
 
-    @Get(':id')
-    async get(@Param('id') id: string) {
-        return `get one influencer by Id ${id}`;
-    }
-
-    @Put(':id')
-    async update(@Param('id') id: string, @Body() dto: any) {
-        return { message: `update one influencer by Id ${id}`, body: dto };
-    }
-
-    @Delete(':id')
-    async delete(@Param('id') id: string) {
-        return { message: `delete one influencer by Id ${id}` };
-    }
-
-    @Patch('avatar')
-    async uploadProfileImage(@Body() dto: any) {
-        return '';
-    }
-
-    @Patch('gallery')
-    async uploadGalleryImage(@Body() dto: any) {
-        return '';
+    @Patch('subjects')
+    @UseGuards(JwtAuthGuard)
+    @UseGuards(InfluencerRole)
+    @ApiBearerAuth()
+    async upsertSubjects(
+        @UserLogged() user: IUserLogged,
+        @Body(new ValidationPipe()) dto: InfluencerSubjectsDto,
+    ) {
+        return await this.influencerService.upsertSubjects(dto, user);
     }
 }

@@ -4,80 +4,88 @@ import {
     ArrayMaxSize,
     ArrayMinSize,
     IsArray,
-    IsDateString,
+    IsEmail,
     IsEnum,
     IsMongoId,
     IsString,
+    Matches,
     MaxLength,
+    MinLength,
     ValidateNested,
 } from 'class-validator';
+import { Match } from '../../../shared/decorators/match.decorator';
 import { Genre } from '../../../shared/enums/genre.enum';
-import { LevelSubscriber } from '../../../shared/enums/level-subscriber.enum';
-import { State } from '../../../shared/enums/state-users.enum';
 import { IInfluencer } from '../../../shared/interfaces/influencer.interface';
+import regexBase from '../../../shared/regex/regex';
 export class CreateInfluencerDto implements IInfluencer {
     @IsString()
-    @ApiProperty()
+    @ApiProperty({ required: true, example: 'Carlos Alberto' })
     name: string;
 
-    @IsEnum(LevelSubscriber)
-    @ApiProperty()
-    level_subscriber: LevelSubscriber;
-
     @IsEnum(Genre)
-    @ApiProperty()
+    @Matches(regexBase.letras, { message: 'apenas M ou F' })
+    @ApiProperty({ required: true, example: 'M' })
     genre: Genre;
 
-    @IsDateString()
-    @ApiProperty()
-    birthDay: Date;
+    @IsString()
+    @Matches(regexBase.data, {
+        message: 'formato de data para aniversário inválido',
+    })
+    @ApiProperty({ required: true, example: '01/01/1990' })
+    birthDay: string;
 
     @IsString()
-    @ApiProperty()
+    @IsEmail({}, { message: 'formato de email inválido' })
+    @ApiProperty({ required: true, example: 'example@example.com.br' })
     email: string;
 
     @IsString()
-    @ApiProperty()
+    @MinLength(8)
+    @MaxLength(50)
+    @ApiProperty({ required: true, example: 'Teste@12345' })
+    @Matches(regexBase.senhaForte, { message: 'senha muito fraca' })
     password: string;
 
     @IsString()
-    @ApiProperty()
+    @MinLength(8)
+    @MaxLength(50)
+    @Match('password')
+    @ApiProperty({ required: true, example: 'Teste@12345' })
+    passwordConfirm: string;
+
+    @IsString()
+    @Matches(regexBase.instagram, { message: 'formato de instagram inválido' })
+    @ApiProperty({ required: true, example: '@teste_' })
     instagram: string;
 
     @IsString()
-    @ApiProperty()
+    @ApiProperty({ required: true, example: 'Santos' })
     city: string;
 
     @IsString()
-    @ApiProperty()
-    state: string;
-
-    @IsString()
-    @MaxLength(2)
-    @IsEnum(State)
-    @ApiProperty()
-    active: State;
+    @ApiProperty({ required: true, example: 'SP' })
+    province: string;
 
     @IsString()
     @MaxLength(14)
-    @ApiProperty()
+    @Matches(regexBase.celular, { message: 'formato de celular inválido' })
+    @ApiProperty({ required: true, example: '(13)98834-2323' })
     phone: string;
-
-    @IsString()
-    @ApiProperty()
-    expoPushToken: string;
 
     @IsArray()
     @ArrayMaxSize(5)
-    @ArrayMinSize(2)
+    @ArrayMinSize(1)
     @ValidateNested({ each: true })
-    @Type(() => Subcategory)
-    @ApiProperty()
-    subcategories?: Subcategory[];
+    @Type(() => ReferenceSubcategoryForRegisterInfluencer)
+    @ApiProperty({
+        required: true,
+        type: () => [ReferenceSubcategoryForRegisterInfluencer],
+    })
+    subcategories?: ReferenceSubcategoryForRegisterInfluencer[];
 }
 
-class Subcategory {
+class ReferenceSubcategoryForRegisterInfluencer {
     @IsMongoId()
-    @ApiProperty()
+    @ApiProperty({ required: true, example: '6067b66f4a2752bdb32e2bac' })
     _id: string;
 }
